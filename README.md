@@ -1,15 +1,8 @@
 # void
 
-A blind journal. You write, but you can't re-read. You can only ask.
+A place to write thoughts without the pressure of rereading them.
 
-Entries are saved to your own Google Drive. Recall is powered by Claude — it surfaces patterns and themes from what you've written without quoting you back to yourself.
-
-## how it works
-
-- **write** — type something, release it. it's gone from view.
-- **recall** — ask a question. Claude reads your entries and responds with what it notices.
-
-Your data lives in a single `void-entries.json` file in your Google Drive. Nothing is stored on a server.
+Write freely, then let it go. If you want to revisit something, ask — Claude will surface what's relevant from what you've written. Your entries are stored in your own Google Drive.
 
 ## setup
 
