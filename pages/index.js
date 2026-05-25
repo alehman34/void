@@ -106,26 +106,7 @@ export default function Home() {
   return (
     <div style={s.page}>
       <Head><title>Void</title></Head>
-      <style>{`
-        @font-face {
-          font-family: 'Untitled Sans';
-          src: url('/fonts/test-untitled-sans-vf-roman.woff2') format('woff2');
-          font-weight: 100 900;
-          font-style: normal;
-        }
-        @font-face {
-          font-family: 'Untitled Sans';
-          src: url('/fonts/test-untitled-sans-vf-italic.woff2') format('woff2');
-          font-weight: 100 900;
-          font-style: italic;
-        }
-        * { box-sizing: border-box; }
-        textarea::placeholder, input::placeholder { color: #c8c8c0; }
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes pulse { 0%,100%{opacity:.2} 50%{opacity:.5} }
-      `}</style>
-
-      <div style={{ width: "100%", maxWidth: "520px" }}>
+<div style={{ width: "100%", maxWidth: "520px" }}>
         {/* mode tabs */}
         <div style={{ display: "flex", alignItems: "baseline", marginBottom: "40px" }}>
           {["write", "recall"].map((m) => (
