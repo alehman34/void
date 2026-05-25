@@ -111,13 +111,13 @@ export default function Home() {
   const isDev = process.env.NODE_ENV === "development";
 
   if (!isDev && status === "loading") {
-    return <div style={s.page}><Head><title>void</title></Head></div>;
+    return <div style={s.page}><Head><title>void</title><link rel="icon" href="/favicon.png" type="image/png" /></Head></div>;
   }
 
   if (!isDev && !session) {
     return (
       <div style={s.page}>
-        <Head><title>void</title></Head>
+        <Head><title>void</title><link rel="icon" href="/favicon.png" type="image/png" /></Head>
         <div style={s.signin}>
           <p style={s.wordmark}>void</p>
           <button onClick={() => signIn("google")} style={s.signinBtn}>
@@ -138,7 +138,13 @@ export default function Home() {
 
   return (
     <div style={s.page}>
-      <Head><title>void</title></Head>
+      <Head>
+        <title>void</title>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+      </Head>
+
+      <img src="/favicon.png" alt="" style={s.logo} />
+      <button onClick={() => signOut()} style={s.logoutFixed}>log out</button>
 
       <div style={s.col}>
         <div style={s.modes}>
@@ -151,8 +157,6 @@ export default function Home() {
               />
             </button>
           ))}
-          <div style={{ flex: 1 }} />
-          <button onClick={() => signOut()} style={s.logout}>log out</button>
         </div>
 
         {showingGone ? (
@@ -230,41 +234,116 @@ export default function Home() {
 
 function NativePlayer() {
   const [playing, setPlaying] = useState(false);
-  const [idx, setIdx] = useState(0);
-  const tracks = [
-    { title: "lieu commun", artist: "Sébastien Tellier" },
-    { title: "Avril 14th", artist: "Aphex Twin" },
-    { title: "Saudade Vem Correndo", artist: "Stan Getz" },
-    { title: "Music for Airports 1/1", artist: "Brian Eno" },
-  ];
-  const t = tracks[idx];
+  const [trackTitle, setTrackTitle] = useState("");
+  const [trackId, setTrackId] = useState("");
+  const [skipHov, setSkipHov] = useState(null);
+  const containerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  const updateTrack = useCallback((player) => {
+    try {
+      const data = player.getVideoData();
+      if (data?.title) setTrackTitle(data.title);
+      if (data?.video_id) setTrackId(data.video_id);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const createPlayer = () => {
+      if (!containerRef.current) return;
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        height: "180",
+        width: "320",
+        playerVars: {
+          listType: "playlist",
+          list: "PLBCPWxiXGtA2K09m8s-c9G0mSJUnKuglf",
+          autoplay: 0,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: (e) => updateTrack(e.target),
+          onStateChange: (e) => {
+            setPlaying(e.data === 1);
+            if (e.data === 1 || e.data === 3 || e.data === 5) {
+              setTimeout(() => updateTrack(e.target), 150);
+            }
+          },
+        },
+      });
+    };
+
+    if (window.YT?.Player) {
+      createPlayer();
+    } else {
+      window.onYouTubeIframeAPIReady = createPlayer;
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    return () => { playerRef.current?.destroy?.(); };
+  }, [updateTrack]);
+
+  const toggle = () => {
+    if (!playerRef.current) return;
+    playing ? playerRef.current.pauseVideo() : playerRef.current.playVideo();
+  };
+
   return (
-    <div style={p.player}>
-      <button onClick={() => setPlaying((v) => !v)} style={p.playBtn} aria-label={playing ? "pause" : "play"}>
-        {playing ? <PauseIcon /> : <PlayIcon />}
-      </button>
-      <div className={"void-bars" + (playing ? " playing" : "")} aria-hidden="true" style={p.bars}>
-        <span /><span /><span />
+    <>
+      <div ref={containerRef} style={{ position: "fixed", left: "-9999px", top: 0, width: "320px", height: "180px" }} />
+      <div style={p.player}>
+        <button onClick={toggle} style={p.playBtn} aria-label={playing ? "pause" : "play"}>
+          {playing ? <PauseIcon /> : <PlayIcon />}
+        </button>
+        <div className={"void-bars" + (playing ? " playing" : "")} aria-hidden="true" style={p.bars}>
+          <span /><span /><span />
+        </div>
+        <div style={p.meta}>
+          {trackId ? (
+            <a
+              href={`https://www.youtube.com/watch?v=${trackId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={p.title}
+            >
+              {trackTitle || "—"}
+            </a>
+          ) : (
+            <div style={p.title}>{trackTitle || "—"}</div>
+          )}
+        </div>
+        <button
+          onClick={() => playerRef.current?.previousVideo()}
+          onMouseEnter={() => setSkipHov("prev")}
+          onMouseLeave={() => setSkipHov(null)}
+          style={{ ...p.skip, color: skipHov === "prev" ? "#1a1a1a" : "#888" }}
+          aria-label="previous"
+        >
+          <SkipIcon dir="back" />
+        </button>
+        <button
+          onClick={() => playerRef.current?.nextVideo()}
+          onMouseEnter={() => setSkipHov("next")}
+          onMouseLeave={() => setSkipHov(null)}
+          style={{ ...p.skip, color: skipHov === "next" ? "#1a1a1a" : "#888" }}
+          aria-label="next"
+        >
+          <SkipIcon dir="fwd" />
+        </button>
       </div>
-      <div style={p.meta}>
-        <div style={p.title}>{t.title}</div>
-        <div style={p.artist}>{t.artist}</div>
-      </div>
-      <button onClick={() => setIdx((i) => (i - 1 + tracks.length) % tracks.length)} style={p.skip} aria-label="previous">
-        <SkipIcon dir="back" />
-      </button>
-      <button onClick={() => setIdx((i) => (i + 1) % tracks.length)} style={p.skip} aria-label="next">
-        <SkipIcon dir="fwd" />
-      </button>
-    </div>
+    </>
   );
 }
 
 function PlayIcon() {
-  return <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M1.5 1L6.5 4 1.5 7Z" /></svg>;
+  return <svg width="12" height="12" viewBox="0 0 8 8" fill="currentColor"><path d="M1.5 1L6.5 4 1.5 7Z" /></svg>;
 }
 function PauseIcon() {
-  return <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><rect x="1.5" y="1" width="1.6" height="6" /><rect x="4.9" y="1" width="1.6" height="6" /></svg>;
+  return <svg width="12" height="12" viewBox="0 0 8 8" fill="currentColor"><rect x="1.5" y="1" width="1.6" height="6" /><rect x="4.9" y="1" width="1.6" height="6" /></svg>;
 }
 function SkipIcon({ dir }) {
   return (
@@ -325,7 +404,13 @@ const s = {
     height: "1px", background: "#111", transformOrigin: "left",
     transition: "transform 0.28s cubic-bezier(0.4, 0.2, 0.2, 1)",
   },
-  logout: {
+  logo: {
+    position: "fixed", top: "20px", left: "24px",
+    width: "28px", height: "28px", objectFit: "contain",
+    opacity: 0.85,
+  },
+  logoutFixed: {
+    position: "fixed", top: "22px", right: "24px",
     background: "none", border: "none", cursor: "pointer",
     fontSize: "12px", color: "#ccc", fontFamily: FONT, padding: 0,
   },
@@ -382,7 +467,7 @@ const p = {
     fontFamily: FONT,
   },
   playBtn: {
-    width: 22, height: 22, borderRadius: "50%",
+    width: 32, height: 32, borderRadius: "50%",
     background: "transparent", color: "#1a1a1a",
     border: "none", padding: 0, cursor: "pointer",
     display: "inline-flex", alignItems: "center", justifyContent: "center",
@@ -395,6 +480,7 @@ const p = {
   title: {
     fontSize: "12px", color: "#1a1a1a",
     whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+    textDecoration: "none", display: "block",
   },
   artist: {
     fontSize: "10.5px", color: "#888", letterSpacing: "0.02em",
@@ -402,6 +488,6 @@ const p = {
   },
   skip: {
     background: "none", border: "none", padding: 4,
-    cursor: "pointer", color: "#bbb", display: "inline-flex",
+    cursor: "pointer", color: "#888", display: "inline-flex",
   },
 };
