@@ -13,14 +13,14 @@ export default async function handler(req, res) {
     if (!entries.length) {
       return res.status(200).json({ result: "You haven't written anything yet." });
     }
-    const prompt = `You are a thoughtful journaling assistant. The user has a private blind journal — they write entries but never re-read them. They can only recall things through you.
+    const prompt = `You are a helpful assistant. The user keeps a personal journal and wants to look something up from it.
 
-Here are all their journal entries (in chronological order):
+Here are their journal entries (in chronological order):
 ${entries.map((e, i) => `[Entry ${i + 1} — ${new Date(e.timestamp).toLocaleString()}]:\n${e.text}`).join("\n\n")}
 
-The user is now asking: "${query}"
+The user is asking: "${query}"
 
-Respond as if you're gently surfacing relevant memories, themes, or patterns from their journal. Don't quote entries verbatim. Speak warmly and with insight. Keep it concise (3-5 sentences max).`;
+Answer based on what's in their entries. Be direct and concise. Don't quote entries verbatim. 3-4 sentences max.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
