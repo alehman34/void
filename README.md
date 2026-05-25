@@ -1,8 +1,8 @@
 # void
 
-A place to write thoughts without the pressure of rereading them.
+A simple app for writing down thoughts. Two modes: write and recall.
 
-Write freely, then let it go. If you want to revisit something, ask — Claude will surface what's relevant from what you've written. Your entries are stored in your own Google Drive.
+Entries are stored as a JSON file in your Google Drive. Recall uses Claude to answer questions about what you've written.
 
 ## setup
 
