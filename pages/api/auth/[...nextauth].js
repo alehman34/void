@@ -21,12 +21,36 @@ export const authOptions = {
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
+        token.expiresAt = Date.now() + account.expires_in * 1000;
+        return token;
       }
-      return token;
+      if (Date.now() < token.expiresAt - 60_000) return token;
+      try {
+        const res = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            grant_type: "refresh_token",
+            refresh_token: token.refreshToken,
+          }),
+        });
+        const refreshed = await res.json();
+        if (!res.ok) throw refreshed;
+        return {
+          ...token,
+          accessToken: refreshed.access_token,
+          expiresAt: Date.now() + refreshed.expires_in * 1000,
+        };
+      } catch (err) {
+        console.error("Token refresh error:", err);
+        return { ...token, error: "RefreshAccessTokenError" };
+      }
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken;
-      session.refreshToken = token.refreshToken;
+      session.error = token.error;
       return session;
     },
   },
