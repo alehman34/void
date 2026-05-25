@@ -252,13 +252,14 @@ function PlayerWidget() {
       bottom: "24px",
       left: "50%",
       transform: "translateX(-50%)",
+      width: "min(520px, calc(100vw - 48px))",
       borderRadius: "16px",
       overflow: "hidden",
       boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
     }}>
       <iframe
         src="https://open.spotify.com/embed/playlist/37i9dQZF1E8M765XEbcg6i?utm_source=generator"
-        width="520"
+        width="100%"
         height="80"
         frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
