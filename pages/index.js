@@ -94,6 +94,18 @@ export default function Home() {
     <div style={s.page}>
       <Head><title>Void</title></Head>
       <style>{`
+        @font-face {
+          font-family: 'Untitled Sans';
+          src: url('/fonts/test-untitled-sans-vf-roman.woff2') format('woff2');
+          font-weight: 100 900;
+          font-style: normal;
+        }
+        @font-face {
+          font-family: 'Untitled Sans';
+          src: url('/fonts/test-untitled-sans-vf-italic.woff2') format('woff2');
+          font-weight: 100 900;
+          font-style: italic;
+        }
         * { box-sizing: border-box; }
         textarea::placeholder, input::placeholder { color: #c8c8c0; }
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
@@ -142,7 +154,7 @@ export default function Home() {
                   width: "100%", minHeight: "260px", background: "transparent",
                   border: "none", color: fadeOut ? "transparent" : "#1a1a1a",
                   fontSize: "17px", lineHeight: "1.8",
-                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontFamily: "'Untitled Sans', sans-serif",
                   resize: "none", outline: "none", padding: "0",
                   caretColor: "#999", transition: "color 0.35s ease",
                 }}
@@ -170,7 +182,7 @@ export default function Home() {
                 width: "100%", background: "transparent", border: "none",
                 borderBottom: "1px solid #e8e8e4", color: "#1a1a1a",
                 fontSize: "17px", padding: "0 0 12px", outline: "none",
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontFamily: "'Untitled Sans', sans-serif",
                 caretColor: "#999",
               }}
             />
@@ -189,7 +201,7 @@ export default function Home() {
             {recallResult && !recalling && (
               <div style={{ marginTop: "40px", animation: "fadeIn 0.5s ease" }}>
                 <p style={{ margin: 0, fontSize: "15px", lineHeight: "1.9", color: "#555", fontStyle: "italic",
-                  fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  fontFamily: "'Untitled Sans', sans-serif" }}>
                   {recallResult}
                 </p>
               </div>
@@ -209,7 +221,7 @@ const s = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    fontFamily: "Georgia, 'Times New Roman', serif",
+    fontFamily: "'Untitled Sans', sans-serif",
     padding: "24px",
   },
   wordmark: {
@@ -222,6 +234,6 @@ const s = {
     padding: "0",
     fontSize: "12px", letterSpacing: "0.18em",
     cursor: active ? "pointer" : "default",
-    transition: "color 0.15s", fontFamily: "Georgia, 'Times New Roman', serif",
+    transition: "color 0.15s", fontFamily: "'Untitled Sans', sans-serif",
   }),
 };
