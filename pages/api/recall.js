@@ -20,7 +20,7 @@ ${entries.map((e, i) => `[Entry ${i + 1} — ${new Date(e.timestamp).toLocaleStr
 
 The user is now asking: "${query}"
 
-Respond as if you're gently surfacing relevant memories, themes, or patterns from their journal. Don't quote entries verbatim. Speak warmly and with insight — like a wise, trusted friend who has been quietly reading their journal. Focus only on what's genuinely relevant to their question. Keep it concise (3–5 sentences max) unless the question needs more.`;
+Respond as if you're gently surfacing relevant memories, themes, or patterns from their journal. Don't quote entries verbatim. Speak warmly and with insight. Keep it concise (3-5 sentences max).`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -30,16 +30,18 @@ Respond as if you're gently surfacing relevant memories, themes, or patterns fro
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 1024,
         messages: [{ role: "user", content: prompt }],
       }),
     });
+
     const data = await response.json();
-    const result = data.content?.find((b) => b.type === "text")?.text;
+    console.log("Anthropic response:", JSON.stringify(data));
+    const result = data.content?.[0]?.text;
     res.status(200).json({ result: result || "I couldn't surface anything right now." });
   } catch (err) {
-    console.error(err);
+    console.error("Recall error:", err);
     res.status(500).json({ error: "Failed to recall" });
   }
 }
