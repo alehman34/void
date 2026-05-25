@@ -5,6 +5,7 @@ import Head from "next/head";
 export default function Home() {
   const { data: session, status } = useSession();
   const [mode, setMode] = useState("write");
+  const [contentVisible, setContentVisible] = useState(true);
   const [text, setText] = useState("");
   const [sent, setSent] = useState(false);
   const [recallQuery, setRecallQuery] = useState("");
@@ -18,6 +19,16 @@ export default function Home() {
   useEffect(() => {
     if (mode === "write" && textareaRef.current) textareaRef.current.focus();
     if (mode === "recall" && recallRef.current) recallRef.current.focus();
+  }, [mode]);
+
+  const switchMode = useCallback((m) => {
+    if (m === mode) return;
+    setContentVisible(false);
+    setTimeout(() => {
+      setMode(m);
+      setRecallResult("");
+      setContentVisible(true);
+    }, 150);
   }, [mode]);
 
   const handleSend = useCallback(async () => {
@@ -118,7 +129,7 @@ export default function Home() {
           {["write", "recall"].map((m) => (
             <button
               key={m}
-              onClick={() => { setMode(m); setRecallResult(""); }}
+              onClick={() => switchMode(m)}
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 padding: "0", marginRight: "24px",
@@ -133,9 +144,10 @@ export default function Home() {
             background: "none", border: "none", cursor: "pointer",
             fontSize: "12px", color: "#ccc", letterSpacing: "0.1em",
             fontFamily: "inherit", padding: "0",
-          }}>out</button>
+          }}>log out</button>
         </div>
 
+        <div style={{ opacity: contentVisible ? 1 : 0, transition: "opacity 0.15s ease" }}>
         {/* write mode */}
         {mode === "write" && (
           sent ? (
@@ -208,6 +220,7 @@ export default function Home() {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
