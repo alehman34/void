@@ -116,7 +116,7 @@ export default function Home() {
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 padding: "0", marginRight: "24px",
-                fontSize: "13px", letterSpacing: "0.12em",
+                fontSize: "13px",
                 color: mode === m ? "#111" : "#bbb",
                 fontFamily: "inherit", transition: "color 0.15s",
               }}
@@ -125,7 +125,7 @@ export default function Home() {
           <div style={{ flex: 1 }} />
           <button onClick={() => signOut()} style={{
             background: "none", border: "none", cursor: "pointer",
-            fontSize: "12px", color: "#ccc", letterSpacing: "0.1em",
+            fontSize: "12px", color: "#ccc",
             fontFamily: "inherit", padding: "0",
           }}>log out</button>
         </div>
@@ -135,67 +135,57 @@ export default function Home() {
         {mode === "write" && (
           sent ? (
             <div style={{ padding: "60px 0", animation: "fadeIn 0.3s ease" }}>
-              <span style={{ fontSize: "13px", color: "#bbb", letterSpacing: "0.08em" }}>gone</span>
+              <span style={{ fontSize: "13px", color: "#bbb" }}>gone</span>
             </div>
           ) : (
-            <>
+            <div style={s.inputContainer}>
               <textarea
                 ref={textareaRef}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="..."
+                placeholder="write anything"
                 style={{
-                  width: "100%", minHeight: "260px", background: "transparent",
-                  border: "none", color: fadeOut ? "transparent" : "#1a1a1a",
-                  fontSize: "17px", lineHeight: "1.8",
-                  fontFamily: "'Untitled Sans', sans-serif",
-                  resize: "none", outline: "none", padding: "0",
-                  caretColor: "#999", transition: "color 0.35s ease",
+                  ...s.textarea,
+                  color: fadeOut ? "transparent" : "#1a1a1a",
+                  transition: "color 0.35s ease",
                 }}
                 spellCheck={false}
               />
-              <div style={{ marginTop: "20px", display: "flex", justifyContent: "flex-end" }}>
-                <button onClick={handleSend} disabled={!text.trim() || saving} style={s.btn(!!text.trim() && !saving)}>
-                  {saving ? "..." : "release"}
-                </button>
-              </div>
-            </>
+              <button onClick={handleSend} disabled={!text.trim() || saving} style={s.arrowBtn(!!text.trim() && !saving)}>
+                <ArrowUp active={!!text.trim() && !saving} />
+              </button>
+            </div>
           )
         )}
 
         {/* recall mode */}
         {mode === "recall" && (
           <div>
-            <input
-              ref={recallRef}
-              value={recallQuery}
-              onChange={(e) => { setRecallQuery(e.target.value); setRecallResult(""); }}
-              onKeyDown={handleRecallKey}
-              placeholder="ask anything"
-              style={{
-                width: "100%", background: "transparent", border: "none",
-                borderBottom: "1px solid #e8e8e4", color: "#1a1a1a",
-                fontSize: "17px", padding: "0 0 12px", outline: "none",
-                fontFamily: "'Untitled Sans', sans-serif",
-                caretColor: "#999",
-              }}
-            />
-            <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
-              <button onClick={handleRecall} disabled={!recallQuery.trim() || recalling} style={s.btn(!!recallQuery.trim() && !recalling)}>
-                {recalling ? "..." : "recall"}
+            <div style={s.inputContainer}>
+              <textarea
+                ref={recallRef}
+                value={recallQuery}
+                onChange={(e) => { setRecallQuery(e.target.value); setRecallResult(""); }}
+                onKeyDown={handleRecallKey}
+                placeholder="recall anything"
+                style={s.textarea}
+                spellCheck={false}
+              />
+              <button onClick={handleRecall} disabled={!recallQuery.trim() || recalling} style={s.arrowBtn(!!recallQuery.trim() && !recalling)}>
+                <ArrowUp active={!!recallQuery.trim() && !recalling} />
               </button>
             </div>
 
             {recalling && (
-              <div style={{ marginTop: "48px" }}>
-                <div style={{ fontSize: "18px", color: "#aaa", animation: "pulse 2s ease-in-out infinite" }}>◌</div>
+              <div style={{ marginTop: "24px" }}>
+                <div style={{ fontSize: "18px", color: "#ccc", animation: "pulse 2s ease-in-out infinite" }}>◌</div>
               </div>
             )}
 
             {recallResult && !recalling && (
-              <div style={{ marginTop: "40px", animation: "fadeIn 0.5s ease" }}>
-                <p style={{ margin: 0, fontSize: "15px", lineHeight: "1.9", color: "#555", fontStyle: "italic",
+              <div style={{ marginTop: "24px", animation: "fadeIn 0.5s ease" }}>
+                <p style={{ margin: 0, fontSize: "13px", lineHeight: "1.7", color: "#555",
                   fontFamily: "'Untitled Sans', sans-serif" }}>
                   {recallResult}
                 </p>
@@ -209,10 +199,18 @@ export default function Home() {
   );
 }
 
+function ArrowUp({ active }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 11V3M3 7l4-4 4 4" stroke={active ? "#fff" : "#ccc"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 const s = {
   page: {
     minHeight: "100vh",
-    background: "#fafaf8",
+    background: "#ffffff",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -222,14 +220,41 @@ const s = {
   },
   wordmark: {
     margin: "0 0 32px", fontSize: "16px", fontWeight: "400",
-    color: "#bbb", letterSpacing: "0.3em",
+    color: "#bbb",
   },
-  btn: (active) => ({
-    background: "none", border: "none",
-    color: active ? "#555" : "#ccc",
+  inputContainer: {
+    position: "relative",
+    border: "1px solid #e8e8e8",
+    borderRadius: "10px",
+    padding: "14px 14px 48px",
+  },
+  textarea: {
+    width: "100%",
+    minHeight: "160px",
+    background: "transparent",
+    border: "none",
+    outline: "none",
+    resize: "none",
+    fontFamily: "'Untitled Sans', sans-serif",
+    fontSize: "13px",
+    lineHeight: "1.7",
+    color: "#1a1a1a",
+    caretColor: "#999",
     padding: "0",
-    fontSize: "12px", letterSpacing: "0.18em",
+  },
+  arrowBtn: (active) => ({
+    position: "absolute",
+    bottom: "10px",
+    right: "10px",
+    width: "28px",
+    height: "28px",
+    borderRadius: "6px",
+    background: active ? "#111" : "#f4f4f4",
+    border: "none",
     cursor: active ? "pointer" : "default",
-    transition: "color 0.15s", fontFamily: "'Untitled Sans', sans-serif",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "background 0.15s",
   }),
 };
