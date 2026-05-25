@@ -72,6 +72,9 @@ Answer based on what's in their entries. Be direct and concise. Don't quote entr
   } catch (err) {
     console.error("Recall error:", err);
     if (!res.headersSent) res.status(500).json({ error: "Failed to recall" });
-    else res.end();
+    else {
+      res.write(`data: ${JSON.stringify({ text: "Something went wrong." })}\n\n`);
+      res.end();
+    }
   }
 }

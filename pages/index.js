@@ -85,6 +85,12 @@ export default function Home() {
         body: JSON.stringify({ query: recallQuery }),
       });
 
+      if (!res.ok) {
+        setRecallResult("Something went wrong.");
+        setRecalling(false);
+        return;
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let first = true;
@@ -104,7 +110,8 @@ export default function Home() {
           } catch {}
         }
       }
-    } catch {
+    } catch (e) {
+      console.error("Recall error:", e);
       setRecallResult("Something went wrong.");
     }
     setRecalling(false);
