@@ -85,9 +85,11 @@ export default function Home() {
     }
   }, [handleRecall]);
 
-  if (status === "loading") return <div style={s.page}><Head><title>Void</title></Head></div>;
+  const isDev = process.env.NODE_ENV === "development";
 
-  if (!session) {
+  if (!isDev && status === "loading") return <div style={s.page}><Head><title>Void</title></Head></div>;
+
+  if (!isDev && !session) {
     return (
       <div style={s.page}>
         <Head><title>Void</title></Head>
